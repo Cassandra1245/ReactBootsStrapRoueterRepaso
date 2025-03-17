@@ -18,7 +18,7 @@ export const MessProvider = ({ children }) => {
 
 
   return (
-    <MessContext.Provider value={{ messages, usuario }}>
+    <MessContext.Provider value={{ messages, usuario, setMessages }}>
       {children}
     </MessContext.Provider>
   );

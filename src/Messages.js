@@ -1,20 +1,27 @@
 import './App.css';
-import React, { useContext } from 'react';
-import { Row, Col, Container, Card, ListGroup, Carousel } from "react-bootstrap";
+import React, { useContext, useState } from 'react';
+import { Row, Col, Container, Card, ListGroup, Carousel, Modal, Button, Accordion } from "react-bootstrap";
 import MessContext from './MessContext';
-import Menu from './Menu.js'
+import Menu from './Menu.js';
 
 function Messages() {
   const { messages, usuario } = useContext(MessContext);
+
+  const [showModals, setShowModals] = useState({});
+
+  const handleShow = (timestamp) => {
+    setShowModals((prev) => ({ ...prev, [timestamp]: true }));
+  };
+
+  const handleClose = (timestamp) => {
+    setShowModals((prev) => ({ ...prev, [timestamp]: false }));
+  };
 
   return (
     <div className="App">
       <Menu />
 
       <header className="App-header">
-
-
-
         <Container>
 
           <h1>Whattsap de {usuario}</h1>
@@ -25,9 +32,7 @@ function Messages() {
                   style={{
                     backgroundImage: chat.contacto === "Kelly"
                       ? 'url(/persona1.jpg)'
-                      : 'url(/persona2.jpg)'
-                        ? 'url(/persona2.jpg)'
-                        : '', //
+                      : 'url(/persona2.jpg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     height: '100vh',
@@ -46,6 +51,9 @@ function Messages() {
                     </Card.Body>
                     <Card.Footer className="text-muted">
                       <p>{conversacion.timestamp}: {conversacion.estado}</p>
+                      <Button variant="primary" onClick={() => handleShow(conversacion.timestamp)}>
+                        Ver Detalles
+                      </Button>
                     </Card.Footer>
                   </Card>
                 </Carousel.Item>
@@ -70,18 +78,52 @@ function Messages() {
                     </Card.Body>
                     <Card.Footer className="text-muted">
                       <p>{conversacion.timestamp}: {conversacion.estado}</p>
+                      <Button variant="primary" onClick={() => handleShow(conversacion.timestamp)}>
+                        Ver Detalles
+                      </Button>
                     </Card.Footer>
+
+                    <Accordion defaultActiveKey="0">
+                    <Accordion.Item eventKey="1">
+                      <Accordion.Header>Ver Detalles</Accordion.Header>
+                      <Accordion.Body>
+                        <p><strong>Emisor:</strong> {conversacion.emisor}</p>
+                        <p><strong>Contenido:</strong> {conversacion.contenido}</p>
+                        <p><strong>Timestamp:</strong> {conversacion.timestamp}</p>
+                        <p><strong>Estado:</strong> {conversacion.estado}</p>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+
                   </Card>
+
+                  {/* Modal para mostrar los detalles del mensaje */}
+                  <Modal show={showModals[conversacion.timestamp] || false} onHide={() => handleClose(conversacion.timestamp)}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>Detalles del mensaje</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <p><strong>Emisor:</strong> {conversacion.emisor}</p>
+                      <p><strong>Contenido:</strong> {conversacion.contenido}</p>
+                      <p><strong>Timestamp:</strong> {conversacion.timestamp}</p>
+                      <p><strong>Estado:</strong> {conversacion.estado}</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={() => handleClose(conversacion.timestamp)}>
+                        Cerrar
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+
                 </Col>
               ))
             ))}
           </Row>
+
         </Container>
       </header>
     </div>
   );
-
-
 }
 
 export default Messages;
